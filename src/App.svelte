@@ -12,14 +12,14 @@
   var debugCanvasElement;
 
   // state!
-	var status_message = 'waiting for webcam...';
+  var status_message = 'waiting for webcam...';
   var show_instructions = false;
   var distance = undefined;
   var face_detection_timeout_threshhold = 700; // ms
   var requested_distance = undefined;
   var lines_pointing_left = Math.random() > .5;
-  var move_face_back_amount = 3;
-  var move_face_forward_amount = 6;
+  var move_face_back_amount = 5;
+  var move_face_forward_amount = 10;
   var error_in_face_distance_allowed = 3;
   var face_movement_request_timeout_threshhold = 300; // ms
   var key_pressed = null;
@@ -71,8 +71,8 @@
       return
     }
     try {
-      await faceapi.nets.tinyFaceDetector.loadFromUri('face-models/') // load face detector model data
-      await faceapi.nets.faceLandmark68Net.loadFromUri('face-models/') // load facial landmarks model data
+      await faceapi.nets.tinyFaceDetector.loadFromUri('/face-models/') // load face detector model data
+      await faceapi.nets.faceLandmark68Net.loadFromUri('/face-models/') // load facial landmarks model data
     } catch (e) {
       status_message = "couldn't load face detection. does your internet work?"
       return
@@ -123,7 +123,7 @@
         faceapi.draw.drawFaceLandmarks(debugCanvasElement, resizedResult)
         const left_eye = detection.landmarks.positions[TOP_LEFT_EYE_INDEX]
         const right_eye = detection.landmarks.positions[TOP_RIGHT_EYE_INDEX]
-        const mid_eye = faceapi.getCenterPoint([left_eye, right_eye]) // right between the eyes
+        const mid_eye = faceapi.utils.getCenterPoint([left_eye, right_eye]) // right between the eyes
         const mouth = detection.landmarks.positions[TOP_MOUTH_INDEX]
         const face_height_in_camera = mid_eye.sub(mouth).magnitude() // measured on midline from midway between eyes to top lip
 
@@ -188,7 +188,7 @@
         </div>
       {/if}
     </instructions>
-    <p style="text-align: center; color: #999;">your webcam content is never recorded</p>
+    <!-- <p style="text-align: center; color: #999;">your webcam content is never recorded</p> -->
   </div>
 
   <hr />
@@ -202,7 +202,7 @@
     <p>Detected face distance: {distance}</p>
     <p>Requested face distance: {requested_distance}</p>
     <p>Face detection timeout threshhold: <input type="range" bind:value={face_detection_timeout_threshhold} min="0" max="1000" step="50" /> {face_detection_timeout_threshhold}ms </p>
-    <p>Move face back amount: <input type="range" min="0.5" max="20" step="0.5" bind:value={move_face_back_amount} /> {move_face_back_amount}</p>
+    <p>Move face back amount: <input type="range" min="0.5" max="30" step="0.5" bind:value={move_face_back_amount} /> {move_face_back_amount}</p>
     <p>Move face forward amount: <input type="range" min="0.5" max="20" step="0.5" bind:value={move_face_forward_amount} /> {move_face_forward_amount} (this should be about 3 times more than the backward amount)</p>
     <p>Error in face distance allowed: <input type="range" min="0" max="20" step="0.5" bind:value={error_in_face_distance_allowed} /> {error_in_face_distance_allowed}
     <p>Lines pointing to left: {lines_pointing_left}</p>
